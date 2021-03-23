@@ -1,104 +1,138 @@
+//You can edit ALL of the code here
+
 function setup() {
-
-    const allEpisodes = getAllEpisodes();
-    makePageForEpisodes(allEpisodes);    
+  const allEpisodes = getAllEpisodes();
+  makePageForEpisodes(allEpisodes);
 }
 
-// Adding Season # description to the image miniature. 
-
-function header(){
-  const rootElem = document.getElementById("root");
-  const pElement = document.createElement("p");
-  const ParagraphElement  = document.getElementsByTagName(pElement);
- //rootElem.appendChild(ParagraphElement)
-  rootElem.innerHTML = `<div class="container">
-        <form class="mb-3">
-          <select class="episode-select me-md-5 col-12 col-md-5 mb-2" id="movie" name="movies"> 
-          <option class="select-option" value="">See All Episodes</option>; 
-          </select>
-          <input class="me-3 col-md-5 col-12 mb-2 search" type="search" placeholder="Search" aria-label="Search">
-          <p class="search-result text-end"></p>
-          </form>
-      </div>`
-}
-
-function makePageForEpisodes(episodeList){
-  header();
-
-  return header
-}
-
-// Adding Season # description to the image miniature. 
-function getSeasonNumber(seasonNumber){
-    if(seasonNumber <= 9 ){
-      return "0" + seasonNumber 
-    } 
-      return seasonNumber
-}      
-
-// Adding Episode # description to the image miniature. 
-function getEpisodeNumber(episodeNumber){
-    if(episodeNumber <= 9 ){
-      return "0" + episodeNumber 
-    } 
-      return episodeNumber
-}      
-
-// Calling Elements
+  // Level 100
 function makePageForEpisodes(episodeList) {
-  header();
-  const rootElem = document.getElementById("root");
-    
-    episodeList.forEach(episodes => {
+  let episodes = [];
+  let rootElem = document.getElementById("root");
 
-         divElementContainer = document.createElement("div");
-         tittleElement = document.createElement("h4");
-         imageElement = document.createElement("img");
-         summaryElement = document.createElement("div");
-         pElement = document.createElement("p");
-         seasonElement =document.createElement("span")
-         numberElement = document.createElement("span")
-         headerElementContainer = document.createElement("div");
+  
+  rootElem.innerHTML = "";
+  rootElem.style.backgroundColor = "#FFFFFF";
 
-        headerElementContainer.append(tittleElement,seasonElement,numberElement)
-        headerElementContainer.setAttribute("class", "wrapper");
+  console.log(`Got ${episodeList.length} episode(s)`);
+  for (let episode of episodeList) {
 
-        divElementContainer.append(headerElementContainer, imageElement, summaryElement);
+    let boxContainer = document.createElement("div");
+    boxContainer.classList.add("parentWrapper");
+    rootElem.appendChild(boxContainer);
 
-        tittleElement.innerText = episodes.name
-        imageElement.src = episodes.image.medium 
-        summaryElement.innerHTML = episodes.summary
-        pElement.innerText = episodes.summary
-        seasonElement.innerText = "S" + getSeasonNumber(episodes.season)
-        numberElement.innerText = "E"+ getEpisodeNumber(episodes.number)
+    let nameContainer = document.createElement("div");
+    nameContainer.classList.add("nameWrapper");
+    boxContainer.appendChild(nameContainer);
 
+    //to repeat on Level300
+    let rootSeason = `${episode.season}`;
+    let rootEpisode = `${episode.number}`;
+    let paddedSeason = rootSeason.padStart(2, "0");
+    let paddedEpisode = rootEpisode.padStart(2, "0");
 
-        rootElem.appendChild(divElementContainer)
+    nameContainer.innerHTML = `${episode.name} - S${paddedSeason} E${paddedEpisode}`;
 
-    });
+        // seasonElement.innerText = "S" + getSeasonNumber(episodes.season)
+        // numberElement.innerText = "E"+ getEpisodeNumber(episodes.number)
 
-    const inputElement = document.querySelector(".search")
-    inputElement.addEventListener("input", searchEpisodes)
-    function searchEpisodes(){
+    let imgContainer = document.createElement("img");
+    imgContainer.classList.add("imageWrapper");
 
-      const inputElementValue = document.querySelector(".search").value
-      let value = inputElementValue.toLowerCase();
-      const container = document.querySelectorAll(".wrapper");
-      container.forEach(episode => {
+    let usedImage = episode.image.medium;
+    imgContainer.src = usedImage;
+    boxContainer.appendChild(imgContainer);
 
-        const containerValue = episode.textContent.toLowerCase();
+    let txtContainer = document.createElement("span");
+    txtContainer.classList.add("textWrapper");
+    txtContainer.innerHTML = `${episode.summary}`;
+    boxContainer.appendChild(txtContainer);
 
-        if(containerValue.includes(value)){
-          episode.style.display = ""
-        } else { episode.style.display = "none"
-        
-        }
-
-      })
-      
-    }
+    episodes.push(episode);
+  }
 }
+
+// Level 200
+let headerElement = document.getElementsByTagName("header")[0];
+let inputElement = document.createElement("input");
+inputElement.classList.add("input");
+inputElement.setAttribute("placeholder", "Search");
+
+let displayElement = document.createElement("div");
+displayElement.classList.add("display");
+
+let paragraphElement = document.createElement("p");
+paragraphElement.classList.add("paragraph");
+headerElement.appendChild(inputElement);
+headerElement.appendChild(displayElement);
+displayElement.appendChild(paragraphElement);
+
+function searchEpisodes() {
+
+  // study group catch up 
+  let filteredEpisodes = [];
+  let episodeList = getAllEpisodes();
+
+  let word = document.getElementsByTagName("input")[0].value;
+  word = word.toLowerCase();
+
+  let counter = 0;
+  for (let episode of episodeList) {
+    if (
+      episode.name.toLowerCase().match(word) ||
+      episode.summary.toLowerCase().match(word) ||
+      episode.name.toLowerCase().match(parseInt(word)) ||
+      episode.summary.toLowerCase().match(parseInt(word))
+    ) {
+      filteredEpisodes.push(episode);
+      counter++;
+    }
+  }
+  paragraphElement.innerHTML = `Displaying ${counter} / ${episodeList.length} episode(s)`;
+  makePageForEpisodes(filteredEpisodes);
+}
+inputElement.addEventListener("input", searchEpisodes);
+
 window.onload = setup;
+
+// Level 300
+let listOfEpisodes = getAllEpisodes();
+let selectList = document.createElement("select");
+selectList.id = "mySelect";
+selectList.classList.add("select");
+headerElement.appendChild(selectList);
+
+let option = document.createElement("option");
+option.classList.add("option");
+option.textContent = "Episode list";
+selectList.appendChild(option);
+
+// used the tool for level100
+for (let episode of listOfEpisodes) {
+  let option = document.createElement("option");
+  let rootSeason = `${episode.season}`;
+  let rootEpisode = `${episode.number}`;
+  let paddedSeason = rootSeason.padStart(2, "0");
+  let paddedEpisode = rootEpisode.padStart(2, "0");
+
+  option.value = listOfEpisodes.indexOf(episode);
+  option.text = `S${paddedSeason}E${paddedEpisode} - ${episode.name}`;
+  selectList.appendChild(option);
+}
+
+function selectOneEpisode() {
+  if (document.getElementById("mySelect").value === "Option selector") {
+    makePageForEpisodes(listOfEpisodes);
+  } else {
+    let selectedEpisode = [];
+    let index = document.getElementById("mySelect").value;
+    let episodeObject = listOfEpisodes[index];
+    selectedEpisode.push(episodeObject);
+    makePageForEpisodes(selectedEpisode);
+  }
+}
+
+selectList.addEventListener("change", selectOneEpisode);
 
 //Ctrl+K+U```
 //Ctrl+K+C```
