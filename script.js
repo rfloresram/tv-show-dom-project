@@ -1,81 +1,102 @@
 //You can edit ALL of the code here
 
+let allEpisodes = [];
+
 function setup() {
-  const allEpisodes = getAllEpisodes();
+  let headerElement = document.getElementsByTagName("header")[0];
+  headerElement.innerHTML = "";
+  createSearchInput();
+  createEpisodesSelectionList(allEpisodes);
   makePageForEpisodes(allEpisodes);
+  const allShows = getAllShows();
+  createShowsSelectionList(allShows);
 }
 
-  // Level 100
+function formattedEpisode(episode, nameAtStart) {
+  let rootSeason = `${episode.season}`;
+  let rootEpisode = `${episode.number}`;
+  let paddedSeason = rootSeason.padStart(2, "0");
+  let paddedEpisode = rootEpisode.padStart(2, "0");
+
+      // seasonElement.innerText = "S" + getSeasonNumber(episodes.season)
+      // numberElement.innerText = "E"+ getEpisodeNumber(episodes.number)
+
+  if (nameAtStart) {
+    return `${episode.name} - S${paddedSeason}E${paddedEpisode}`;
+  } else {
+    return `S${paddedSeason}E${paddedEpisode} - ${episode.name}`;
+  }
+}
+
 function makePageForEpisodes(episodeList) {
   let episodes = [];
   let rootElem = document.getElementById("root");
 
-  
+// Level 100
+
   rootElem.innerHTML = "";
   rootElem.style.backgroundColor = "#FFFFFF";
 
-  console.log(`Got ${episodeList.length} episode(s)`);
   for (let episode of episodeList) {
-
-    let boxContainer = document.createElement("div");
-    boxContainer.classList.add("parentWrapper");
-    rootElem.appendChild(boxContainer);
+    let parentContainer = document.createElement("div");
+    parentContainer.classList.add("parentWrapper");
+    rootElem.appendChild(parentContainer);
 
     let nameContainer = document.createElement("div");
     nameContainer.classList.add("nameWrapper");
-    boxContainer.appendChild(nameContainer);
+    parentContainer.appendChild(nameContainer);
+    nameContainer.innerHTML = formattedEpisode(episode, true);
 
-    //to repeat on Level300
-    let rootSeason = `${episode.season}`;
-    let rootEpisode = `${episode.number}`;
-    let paddedSeason = rootSeason.padStart(2, "0");
-    let paddedEpisode = rootEpisode.padStart(2, "0");
+    let imageContainer = document.createElement("img");
+    imageContainer.classList.add("imageWrapper");
 
-    nameContainer.innerHTML = `${episode.name} - S${paddedSeason} E${paddedEpisode}`;
+    if (episode.image != null) {
+      let usedImage = episode.image.medium;
+      imageContainer.src = usedImage;
+      parentContainer.appendChild(imageContainer);
+      parentContainer.style.height = "480px";
+    }
 
-        // seasonElement.innerText = "S" + getSeasonNumber(episodes.season)
-        // numberElement.innerText = "E"+ getEpisodeNumber(episodes.number)
-
-    let imgContainer = document.createElement("img");
-    imgContainer.classList.add("imageWrapper");
-
-    let usedImage = episode.image.medium;
-    imgContainer.src = usedImage;
-    boxContainer.appendChild(imgContainer);
-
-    let txtContainer = document.createElement("span");
-    txtContainer.classList.add("textWrapper");
-    txtContainer.innerHTML = `${episode.summary}`;
-    boxContainer.appendChild(txtContainer);
+    if (episode.summary) {
+      let textContainer = document.createElement("span");
+      textContainer.classList.add("textWrapper");
+      textContainer.innerHTML = `${episode.summary}`;
+      parentContainer.appendChild(textContainer);
+    }
 
     episodes.push(episode);
   }
 }
 
 // Level 200
-let headerElement = document.getElementsByTagName("header")[0];
-let inputElement = document.createElement("input");
-inputElement.classList.add("input");
-inputElement.setAttribute("placeholder", "Search");
-
-let displayElement = document.createElement("div");
-displayElement.classList.add("display");
-
-let paragraphElement = document.createElement("p");
-paragraphElement.classList.add("paragraph");
-headerElement.appendChild(inputElement);
-headerElement.appendChild(displayElement);
-displayElement.appendChild(paragraphElement);
+function createSearchInput() {
+  let headerElement = document.getElementsByTagName("header")[0];
+  let inputElement = document.createElement("input");
+  inputElement.classList.add("input");
+  inputElement.setAttribute("placeholder", "Search an episode");
+  let displayElement = document.createElement("div");
+  displayElement.classList.add("display");
+  let paragraphElement = document.createElement("p");
+  paragraphElement.classList.add("paragraph");
+  paragraphElement.setAttribute("data-placeholder", "Full catalogue");
+  headerElement.appendChild(inputElement);
+  headerElement.appendChild(displayElement);
+  displayElement.appendChild(paragraphElement);
+  inputElement.addEventListener("input", searchEpisodes);
+}
 
 function searchEpisodes() {
 
+
   // study group catch up 
   let filteredEpisodes = [];
-  let episodeList = getAllEpisodes();
+  let episodeList = allEpisodes;
 
   let word = document.getElementsByTagName("input")[0].value;
   word = word.toLowerCase();
 
+
+  // used the tool for level 100
   let counter = 0;
   for (let episode of episodeList) {
     if (
@@ -88,51 +109,134 @@ function searchEpisodes() {
       counter++;
     }
   }
+  let paragraphElement = document.getElementsByClassName("paragraph")[0];
   paragraphElement.innerHTML = `Displaying ${counter} / ${episodeList.length} episode(s)`;
   makePageForEpisodes(filteredEpisodes);
+  let selectList = document.getElementsByClassName("select")[0];
+  selectList.value = "Select an episode"; 
 }
-inputElement.addEventListener("input", searchEpisodes);
-
-window.onload = setup;
 
 // Level 300
-let listOfEpisodes = getAllEpisodes();
-let selectList = document.createElement("select");
-selectList.id = "mySelect";
-selectList.classList.add("select");
-headerElement.appendChild(selectList);
 
-let option = document.createElement("option");
-option.classList.add("option");
-option.textContent = "Episode list";
-selectList.appendChild(option);
+function createEpisodesSelectionList(listOfEpisodes) {
+  let selectList = document.createElement("select");
+  selectList.classList.add("select");
+  let headerElement = document.getElementsByTagName("header")[0];
+  headerElement.appendChild(selectList);
 
-// used the tool for level100
-for (let episode of listOfEpisodes) {
   let option = document.createElement("option");
-  let rootSeason = `${episode.season}`;
-  let rootEpisode = `${episode.number}`;
-  let paddedSeason = rootSeason.padStart(2, "0");
-  let paddedEpisode = rootEpisode.padStart(2, "0");
-
-  option.value = listOfEpisodes.indexOf(episode);
-  option.text = `S${paddedSeason}E${paddedEpisode} - ${episode.name}`;
+  option.classList.add("option");
+  option.textContent = "Select an episode";
   selectList.appendChild(option);
+
+  for (let episode of listOfEpisodes) {
+    let option = document.createElement("option");
+    option.text = formattedEpisode(episode, false);
+    option.value = listOfEpisodes.indexOf(episode);
+    selectList.appendChild(option);
+  }
+  selectList.addEventListener("change", selectOneEpisode);
 }
 
 function selectOneEpisode() {
-  if (document.getElementById("mySelect").value === "Option selector") {
+  let listOfEpisodes = allEpisodes;
+  let inputElement = document.getElementsByClassName("input")[0];
+  inputElement.value = "";
+
+  let paragraphElement = document.getElementsByClassName("paragraph")[0];
+  paragraphElement.innerHTML = `Displaying your selection`;
+
+  let selectList = document.getElementsByClassName("select")[0];
+  if (selectList.value === "Select an episode") { 
+    paragraphElement.innerHTML = `Full catalogue`;
     makePageForEpisodes(listOfEpisodes);
   } else {
+
     let selectedEpisode = [];
-    let index = document.getElementById("mySelect").value;
+    let index = selectList.value;
     let episodeObject = listOfEpisodes[index];
     selectedEpisode.push(episodeObject);
     makePageForEpisodes(selectedEpisode);
   }
 }
 
-selectList.addEventListener("change", selectOneEpisode);
+// Level 400
+
+function createShowsSelectionList() {
+  let listOfShows = getAllShows();
+  listOfShows.sort((a, b) => (a.name > b.name ? 1 : -1));
+
+  // When a show is selected, your app should display the episodes
+
+  let selectList = document.createElement("select");
+  selectList.classList.add("select");
+  let headerElement = document.getElementsByTagName("header")[0];
+  headerElement.appendChild(selectList);
+
+  let option = document.createElement("option");
+  option.classList.add("option");
+  option.textContent = "Home - Series Selection";
+  selectList.appendChild(option);
+
+  for (let show of listOfShows) {
+    let option = document.createElement("option");
+    option.text = show.name;
+    option.value = listOfShows.indexOf(show);
+    selectList.appendChild(option);
+  }
+  selectList.addEventListener("change", selectOneShow);
+}
+
+function selectOneShow() {
+  let listOfShows = getAllShows();
+
+  listOfShows.sort((a, b) => (a.name > b.name ? 1 : -1));
+  let inputElement = document.getElementsByClassName("input")[0];
+  inputElement.value = "";
+
+  let paragraphElement = document.getElementsByClassName("paragraph")[0];
+  paragraphElement.innerHTML = `Displaying your selection`;
+
+  let selectList = document.getElementsByClassName("select")[1];
+  if (selectList.value === "Home - Series Selection") {
+    paragraphElement.innerHTML = `Full catalogue`;
+    makePageForEpisodes(listOfShows);
+  } else {
+    let selectedShow = [];
+    let index = selectList.value;
+    let episodeObject = listOfShows[index];
+    selectedShow.push(episodeObject);
+    let id = selectedShow[0].id;
+    fetchData(id);
+  }
+}
+
+// Level 350
+
+// When your page loads, it must load the episodes (for the SAME show) from TVMaze API, using fetch.
+
+const fetchData = (showID) => {
+  const URL = `https://api.tvmaze.com/shows/${showID}/episodes`;
+  fetch(URL)
+    .then(function (response) {
+      if (response.status >= 200 && response.status <= 299) {
+        return response.json();
+      } else {
+        throw `Error: ${response.statusText}`;
+      }
+    })
+    //  Incorporate error handling
+
+    .then(function (episodeList) {
+      allEpisodes = episodeList;
+      setup();
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+};
+
+window.onload = fetchData(82);
 
 //Ctrl+K+U```
 //Ctrl+K+C```
