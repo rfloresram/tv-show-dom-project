@@ -7,15 +7,8 @@ function setup() {
   headerElement.innerHTML = "";
   createSearchInput();
   createEpisodesSelectionList(allEpisodes);
+  makePageForEpisodes(allEpisodes);
   const allShows = getAllShows();
-
-  makePageForEpisodes(allShows);
-
-  //Edited 28 March - On class correction (function need to be called before for work)
-  let paragraphElement = document.getElementsByClassName("paragraph")[0];
-  paragraphElement.innerHTML = `Displaying your selection`;
-
-
   createShowsSelectionList(allShows);
 }
 
@@ -83,11 +76,7 @@ function createSearchInput() {
   inputElement.setAttribute("placeholder", "Search an episode");
   let displayElement = document.createElement("div");
   displayElement.classList.add("display");
-
-  //New Id declaration here!
   let paragraphElement = document.createElement("p");
-  paragraphElement.setAttribute("id", "numberOfEpisodes");
-
   paragraphElement.classList.add("paragraph");
   paragraphElement.setAttribute("data-placeholder", "Full catalogue");
   headerElement.appendChild(inputElement);
@@ -223,6 +212,7 @@ function selectOneShow() {
 }
 
 // Level 350
+
 // When your page loads, it must load the episodes (for the SAME show) from TVMaze API, using fetch.
 
 const fetchData = (showID) => {
@@ -235,8 +225,8 @@ const fetchData = (showID) => {
         throw `Error: ${response.statusText}`;
       }
     })
-
     //  Incorporate error handling
+
     .then(function (episodeList) {
       allEpisodes = episodeList;
       setup();

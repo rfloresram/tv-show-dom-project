@@ -31,7 +31,7 @@ body {
 .input,
 .display,
 .select {
-  padding: 0 5px;
+  padding: 0 10px;
   height: 1.5em;
   border-radius: 0%;
   font-weight: lighter;
@@ -160,9 +160,6 @@ footer a:active {
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   }
 
-
-  /* Displaying your selection */
-  
   .display,
   .paragraph,
   .input,
