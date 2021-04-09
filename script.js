@@ -3,12 +3,16 @@
 let allEpisodes = [];
 
 function setup() {
-  let headerElement = document.getElementsByTagName("header")[0];
+let headerElement = document.getElementsByTagName("header")[0];
+
   headerElement.innerHTML = "";
   createSearchInput();
+
   createEpisodesSelectionList(allEpisodes);
   makePageForEpisodes(allEpisodes);
+
   const allShows = getAllShows();
+
   createShowsSelectionList(allShows);
 }
 
